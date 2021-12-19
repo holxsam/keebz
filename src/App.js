@@ -1,53 +1,45 @@
 import { useEffect, useState } from "react";
-import keyNames from "./utils/keycodes.json";
+import styled from "@emotion/styled";
+import KeyboardLayout from "./components/KeyboardLayout";
 
-const { ipcRenderer } = window; // this is possible because of the preload.js + main.js
-// other we would need to use `const { ipcRenderer } = window.require("electron");`
+import DEFAULT_QWERTY from "./keyboard-layouts/qwerty-100.json";
+import ORTHO_QWERTY from "./keyboard-layouts/ortho-qwerty-60.json";
+import useGlobalKeyboardListener from "./hooks/useGlobalKeyboardListener";
 
-function App() {
-  const [kbs, setKeys] = useState([]);
+const AppContainer = styled.div`
+  /* border: 2px dashed lightblue; */
 
-  const addToKeys = (keycode) => {
-    setKeys((allKeys) => {
-      const index = allKeys.findIndex((v) => v === keycode);
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
 
-      if (index === -1) return [...allKeys, keycode];
-      else return allKeys;
-    });
-  };
+  display: flex;
+  flex-direction: column;
 
-  const deleteFromKeys = (keycode) => {
-    setKeys((allKeys) => {
-      const index = allKeys.findIndex((v) => v === keycode);
-      return [
-        ...allKeys.slice(0, index),
-        ...allKeys.slice(index + 1, allKeys.length),
-      ];
-    });
-  };
+  @media (max-width: ${({ theme }) => theme.breakpoints.s}px) {
+    flex-direction: column;
+  }
+`;
 
-  useEffect(() => {
-    ipcRenderer.on("keydown", (e, m) => {
-      addToKeys(m);
-    });
+const LastInput = styled.p`
+  background-color: ${({ theme }) => theme.colors.primary.main};
+  padding: 0.25rem;
+`;
 
-    ipcRenderer.on("keyup", (e, m) => {
-      deleteFromKeys(m);
-    });
-  }, []);
+const App = () => {
+  const { lastKeyPressed, kbInputs, isKeyPressed } =
+    useGlobalKeyboardListener();
 
   return (
-    <div className="App">
-      <header className="App-header">
-        <div>
-          {kbs.map((item, i) => (
-            <p key={i}>{keyNames[item]}</p>
-          ))}
-        </div>
-        <p onClick={() => console.log(keyNames)}>start typing to see keys</p>
-      </header>
-    </div>
+    <AppContainer id="app">
+      {/* <KeyboardLayout layoutConfig={ORTHO_QWERTY} /> */}
+      <LastInput>
+        last input: <pre>{JSON.stringify(lastKeyPressed, null, 2)}</pre>
+      </LastInput>
+      <KeyboardLayout layoutConfig={DEFAULT_QWERTY} />
+      <KeyboardLayout layoutConfig={ORTHO_QWERTY} />
+    </AppContainer>
   );
-}
+};
 
 export default App;

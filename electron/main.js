@@ -17,11 +17,14 @@ let mainWindow = null;
 
 ioHook.on("keydown", (key) => {
   // console.log(keyNames[key.keycode]);
+  console.log(key.keycode);
   mainWindow.webContents.send("keydown", key.keycode);
 });
 
 ioHook.on("keyup", (key) => {
   // console.log(keyNames[key.keycode]);
+  console.log(key.keycode);
+
   mainWindow.webContents.send("keyup", key.keycode);
 });
 
@@ -40,12 +43,10 @@ const createWindow = () => {
       protocol: "file:",
       slashes: true,
     });
-  // console.log(process.env);
-  console.log({ startUrl });
 
   // Create the browser window.
   mainWindow = new BrowserWindow({
-    width: 800,
+    width: 1000,
     height: 600,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
@@ -57,7 +58,8 @@ const createWindow = () => {
     },
   });
 
-  // mainWindow.setAlwaysOnTop(true, "floating");
+  // app.dock.hide();
+  // mainWindow.setAlwaysOnTop(true, "normal");
   mainWindow.setVisibleOnAllWorkspaces(true);
   mainWindow.setFullScreenable(false);
 

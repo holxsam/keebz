@@ -4,9 +4,14 @@ import ReactDOM from "react-dom";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 
+import { HashRouter } from "react-router-dom";
+import { ThemeStateProvider } from "./contexts/ThemeContext";
+
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <ThemeStateProvider>
+      <App />
+    </ThemeStateProvider>
   </React.StrictMode>,
   document.getElementById("root")
 );
