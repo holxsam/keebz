@@ -46,6 +46,7 @@ const createWindow = () => {
 
   // Create the browser window.
   mainWindow = new BrowserWindow({
+    // frame: false,
     width: 1000,
     height: 600,
     webPreferences: {
@@ -55,6 +56,7 @@ const createWindow = () => {
       contextIsolation: false,
       enableRemoteModule: true,
       devTools: true,
+      nativeWindowOpen: true,
     },
   });
 

@@ -5,12 +5,15 @@ import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 
 import { HashRouter } from "react-router-dom";
+import { UIStateProvider } from "./contexts/UIContext";
 import { ThemeStateProvider } from "./contexts/ThemeContext";
 
 ReactDOM.render(
   <React.StrictMode>
     <ThemeStateProvider>
-      <App />
+      <UIStateProvider>
+        <App />
+      </UIStateProvider>
     </ThemeStateProvider>
   </React.StrictMode>,
   document.getElementById("root")
