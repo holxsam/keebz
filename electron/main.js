@@ -16,22 +16,24 @@ console.log("packaged?:", app.isPackaged);
 let mainWindow = null;
 
 ioHook.on("keydown", (key) => {
-  // console.log(keyNames[key.keycode]);
-  console.log(key.keycode);
+  console.log("down:", key.keycode);
   mainWindow.webContents.send("keydown", key.keycode);
 });
 
 ioHook.on("keyup", (key) => {
-  // console.log(keyNames[key.keycode]);
-  console.log(key.keycode);
-
+  console.log("up  :", key.keycode);
   mainWindow.webContents.send("keyup", key.keycode);
 });
 
-// ioHook.on("mouseclick", (event) => {
-//   console.log("click");
-//   // mainWindow.webContents.send("mouseclick", event);
-// });
+ioHook.on("mousedown", (event) => {
+  console.log("mdown:", event);
+  mainWindow.webContents.send("mousedown", event);
+});
+
+ioHook.on("mouseup", (event) => {
+  console.log("mup  :", event);
+  mainWindow.webContents.send("mouseup", event);
+});
 
 ioHook.start();
 

@@ -1,4 +1,9 @@
 {
+  "-20": "left button",
+  "-21": "right button",
+  "-22": "middle button",
+  "-23": "bottom side button",
+  "-24": "top side button",
   "0": "§",
   "1": "Esc",
   "2": "1",

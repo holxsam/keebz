@@ -2,8 +2,8 @@ import styled from "@emotion/styled";
 import { AnimatePresence, motion, useDragControls } from "framer-motion";
 import { MdClose } from "react-icons/md";
 import { useDraggable } from "@dnd-kit/core";
-import { useRef, useState } from "react";
-import { useEffect } from "react/cjs/react.development";
+import React, { useRef, useState } from "react";
+import { useEffect } from "react";
 import { CSS } from "@dnd-kit/utilities";
 
 const InputContainer = styled.div`

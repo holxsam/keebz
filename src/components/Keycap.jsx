@@ -1,4 +1,4 @@
-import { useEffect, useState, memo } from "react";
+import React, { useEffect, useState, memo } from "react";
 import styled from "@emotion/styled";
 import keyNames from "../utils/keycodes.json";
 import { css } from "@emotion/react";

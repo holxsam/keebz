@@ -1,4 +1,4 @@
-import { createRef, useEffect, useRef, useState } from "react";
+import React, { createRef, useEffect, useRef, useState } from "react";
 import styled from "@emotion/styled";
 import keyNames from "../utils/keycodes.json";
 import { css } from "@emotion/react";
@@ -19,6 +19,7 @@ import {
   restrictToWindowEdges,
   restrictToParentElement,
 } from "@dnd-kit/modifiers";
+import useGlobalMouseListener from "../hooks/useGlobalMouseListener";
 
 const UNIT = 70; // px
 const KEY_GAP = 5; // px
@@ -88,10 +89,12 @@ const KeycapData = styled.div`
 const rowify = (arr) => {
   const finalArray = [];
 
-  const rows = new Set();
+  const rowNumbers = new Set();
   arr.forEach((item) => {
-    rows.add(item.position.row);
+    rowNumbers.add(item.position.row);
   });
+
+  const rows = [...rowNumbers].sort();
 
   rows.forEach((row) => {
     finalArray.push(
@@ -108,6 +111,8 @@ const KeyboardLayout = ({ layoutConfig = DEFAULT_LAYOUT }) => {
   const { drawerState, setDrawerState } = useUIState();
   const { lastKeyPressed, kbInputs, isKeyPressed } =
     useGlobalKeyboardListener();
+
+  const { mouseInputs, isMouseClickHeld } = useGlobalMouseListener();
 
   const [layout, setLayout] = useState(layoutConfig.layout);
   const layout2d = rowify(layout);
@@ -128,6 +133,8 @@ const KeyboardLayout = ({ layoutConfig = DEFAULT_LAYOUT }) => {
     // transition: { velocity: 500 },
   };
 
+  const isInputOn = (keycode) =>
+    isKeyPressed(keycode) || isMouseClickHeld(keycode);
   const deselectKeys = () => setKeySelectedId(null);
 
   const changeKeyConfig = (id, values) => {
@@ -154,18 +161,21 @@ const KeyboardLayout = ({ layoutConfig = DEFAULT_LAYOUT }) => {
       >
         {/* <p>{windowSize.width}x{windowSize.height}</p> */}
         {/* <p>{JSON.stringify(selected)}</p> */}
-        <pre>{JSON.stringify(keySelectedId, null, 2)}</pre>
-        <pre>{JSON.stringify(keySelected)}</pre>
+        {/* <pre>{JSON.stringify(keySelectedId, null, 2)}</pre> */}
+        {/* <pre>{JSON.stringify(keySelected)}</pre> */}
         {/* <p>{JSON.stringify(config)}</p> */}
         {/* <pre>{JSON.stringify(config.slice(-5), null, 2)}</pre> */}
+        {/* <pre>{JSON.stringify(mouseInputs, null, 2)}</pre> */}
         {/* <p>{JSON.stringify(keyPropTranslate)}</p> */}
+
         {layout2d.map((row, i) => (
           <Row key={i}>
             {row.map((keyData, j) => (
               <Keycap
                 key={j}
                 keyData={keyData}
-                pressed={isKeyPressed(keyData.kc)}
+                // pressed={isKeyPressed(keyData.kc)}
+                pressed={isInputOn(keyData.kc)}
                 selected={keySelectedId === keyData.id}
                 onClick={() => {
                   if (keySelectedId === keyData.id) deselectKeys();
