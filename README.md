@@ -8,5 +8,5 @@ To develop:
 To distribute the application:
 
 1. build react files: `npm run build-react`
-2. build electron files (which really just copies them to the build folder): `npm run build-eletron`
+2. build electron files (which really just copies them to the build folder): `npm run build-electron`
 3. generate installers: `npm run package`
