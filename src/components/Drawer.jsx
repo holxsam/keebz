@@ -4,10 +4,12 @@ import { useUIState } from "../contexts/UIContext";
 
 const Container = styled(motion.div)`
   /* border: 1px solid white; */
-  width: 100%;
-  position: absolute;
 
-  background-color: rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  width: 100%;
+  /* position: absolute; */
+
+  background-color: rgba(0, 0, 0, 1);
 
   overflow: hidden;
 `;
@@ -35,7 +37,6 @@ const Drawer = () => {
       {...animProps}
       onClick={() => {
         toggleDrawer();
-        console.log("uhh", drawerState);
       }}
     ></Container>
   );

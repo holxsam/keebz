@@ -6,19 +6,12 @@ import React, { useRef, useState } from "react";
 import { useEffect } from "react";
 import { CSS } from "@dnd-kit/utilities";
 
-const InputContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
-const WidthInput = styled.input`
-  color: black;
-`;
-
 const KeyPropContainer = styled(motion.div)`
   overflow: hidden;
   position: absolute;
   background-color: rgba(25, 25, 25, 0.7);
+  background-color: rgba(25, 25, 25, 1);
+
   width: 20rem;
   height: 30rem;
   /* outline: 1px solid rgba(255, 255, 255, 0.2); */
@@ -27,8 +20,8 @@ const KeyPropContainer = styled(motion.div)`
   /* border: 2px solid ${({ theme }) => theme.colors.onPrimary.main}; */
   /* padding: 1rem; */
 
-  backdrop-filter: blur(1.5px);
-  backdrop-filter: blur(5px);
+  /* backdrop-filter: blur(1.5px); */
+  /* backdrop-filter: blur(5px); */
   /* box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.75); */
   box-shadow: 0px 0px 0px 1px rgba(255, 255, 255, 0.2);
 
@@ -40,7 +33,9 @@ const KeyPropContainer = styled(motion.div)`
 
 const KeyPropHeader = styled(motion.div)`
   padding: 0.75rem;
+
   /* height: 4rem; */
+
   cursor: grab;
 
   /* border: 1px solid red; */
@@ -72,9 +67,12 @@ const Svg = styled(motion.svg)`
 `;
 
 const H = styled.h1`
+  user-select: none;
   flex: 1;
   font-weight: 800;
   letter-spacing: 1px;
+
+  outline: 1px solid red;
 `;
 
 const CircleButton = styled(motion.button)`

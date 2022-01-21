@@ -28,6 +28,7 @@ const BlankKey = styled.button`
 `;
 
 const Key = styled(motion.button)`
+  -webkit-app-region: no-drag;
   width: 100%;
   height: 100%;
   overflow: hidden;
@@ -84,9 +85,6 @@ const Keycap = ({
 }) => {
   const width = Math.max(keyData.w * unit, 3 + keyGap);
   const height = Math.max(keyData.h * unit, 3 + keyGap);
-  useEffect(() => {
-    console.log("rerender", keyData.kc);
-  });
 
   return (
     <KeySlot w={width} h={height} keyGap={keyGap}>

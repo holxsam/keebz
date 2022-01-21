@@ -20,6 +20,10 @@ import {
   restrictToParentElement,
 } from "@dnd-kit/modifiers";
 import useGlobalMouseListener from "../hooks/useGlobalMouseListener";
+import CounterInput from "./inputs/CounterInput";
+import KeycapSettings from "./KeycapSettings";
+
+const ipcRenderer = window.ipcRenderer;
 
 const UNIT = 70; // px
 const KEY_GAP = 5; // px
@@ -44,46 +48,23 @@ const Row = styled.div`
   flex-direction: row;
 `;
 
-const SkillContainer = styled(motion.div)`
-  position: fixed;
-  top: calc(100vh / 2);
-  left: 50%;
-
-  padding: 0 0.7rem;
-
-  transform: translate3d(-50%, -50%, 0);
-
-  width: 100%;
-  max-width: 30rem;
-
-  border: 1px solid white;
-  border-radius: 5px;
-
-  background-color: ${({ theme }) => theme.colors.surface.main};
-  padding: 1rem;
-
-  display: flex;
-  flex-direction: column;
-
-  /* background-color: red; */
-`;
-
 const InputContainer = styled.div`
   display: flex;
   flex-direction: column;
 `;
 
-const WidthInput = styled.input`
-  color: black;
-`;
+const PresentationButton = styled.button`
+  -webkit-app-region: no-drag;
 
-const KeyCapInfo = styled.div`
-  display: flex;
-`;
+  position: absolute;
+  bottom: 0;
+  right: 0;
 
-const KeycapData = styled.div`
-  display: flex;
-  flex-direction: column;
+  width: 3rem;
+  height: 3rem;
+  margin: 1rem;
+
+  background-color: #222;
 `;
 
 const rowify = (arr) => {
@@ -108,7 +89,13 @@ const rowify = (arr) => {
 };
 
 const KeyboardLayout = ({ layoutConfig = DEFAULT_LAYOUT }) => {
-  const { drawerState, setDrawerState } = useUIState();
+  const {
+    drawerState,
+    setDrawerState,
+    presentationMode,
+    setPresentationMode,
+    togglePresentationMode,
+  } = useUIState();
   const { lastKeyPressed, kbInputs, isKeyPressed } =
     useGlobalKeyboardListener();
 
@@ -144,11 +131,15 @@ const KeyboardLayout = ({ layoutConfig = DEFAULT_LAYOUT }) => {
         return [
           ...layout.slice(0, index),
           ...layout.slice(index + 1, layout.length),
-          values,
+          { ...layout[index], ...values },
         ];
       else return layout;
     });
   };
+
+  useEffect(() => {
+    if (presentationMode) setKeySelectedId(null);
+  }, [presentationMode]);
 
   return (
     <DndContext
@@ -159,15 +150,11 @@ const KeyboardLayout = ({ layoutConfig = DEFAULT_LAYOUT }) => {
       // ref={setNodeRef}
       // style={style}
       >
-        {/* <p>{windowSize.width}x{windowSize.height}</p> */}
-        {/* <p>{JSON.stringify(selected)}</p> */}
-        {/* <pre>{JSON.stringify(keySelectedId, null, 2)}</pre> */}
-        {/* <pre>{JSON.stringify(keySelected)}</pre> */}
-        {/* <p>{JSON.stringify(config)}</p> */}
-        {/* <pre>{JSON.stringify(config.slice(-5), null, 2)}</pre> */}
-        {/* <pre>{JSON.stringify(mouseInputs, null, 2)}</pre> */}
-        {/* <p>{JSON.stringify(keyPropTranslate)}</p> */}
-
+        {presentationMode && (
+          <PresentationButton type="button" onClick={togglePresentationMode}>
+            P
+          </PresentationButton>
+        )}
         {layout2d.map((row, i) => (
           <Row key={i}>
             {row.map((keyData, j) => (
@@ -178,6 +165,7 @@ const KeyboardLayout = ({ layoutConfig = DEFAULT_LAYOUT }) => {
                 pressed={isInputOn(keyData.kc)}
                 selected={keySelectedId === keyData.id}
                 onClick={() => {
+                  setPresentationMode(false);
                   if (keySelectedId === keyData.id) deselectKeys();
                   else setKeySelectedId(keyData.id);
                 }}
@@ -186,36 +174,42 @@ const KeyboardLayout = ({ layoutConfig = DEFAULT_LAYOUT }) => {
           </Row>
         ))}
 
-        <AnimatePresence>
-          {keySelectedId !== null && (
-            <KeycapProperties close={deselectKeys}>
+        {keySelectedId !== null && (
+          <DrawerItem>
+            <KeycapSettings close={deselectKeys}>
               <Keycap keyData={keySelected} pressed={false} selected={false} />
-              <p>name: {keyNames[keySelected.kc]}</p>{" "}
+              <p>name: {keyNames[keySelected.kc]}</p>
               <p>keycode: {keySelected.kc}</p>
               <InputContainer>
                 {JSON.stringify(keySelected)}
-                <WidthInput
+
+                <CounterInput
+                  id="width-input"
+                  label="W"
+                  step={0.05}
                   value={keySelected.w}
-                  onChange={(e) => {
+                  onChange={(val) => {
                     changeKeyConfig(keySelected.id, {
-                      ...keySelected,
-                      w: e.target.value,
+                      w: val,
                     });
                   }}
                 />
-                <WidthInput
+
+                <CounterInput
+                  id="height-input"
+                  label="H"
+                  step={0.05}
                   value={keySelected.h}
-                  onChange={(e) => {
+                  onChange={(val) => {
                     changeKeyConfig(keySelected.id, {
-                      ...keySelected,
-                      h: e.target.value,
+                      h: val,
                     });
                   }}
                 />
               </InputContainer>
-            </KeycapProperties>
-          )}
-        </AnimatePresence>
+            </KeycapSettings>
+          </DrawerItem>
+        )}
       </Container>
     </DndContext>
   );
