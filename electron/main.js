@@ -13,7 +13,10 @@ const ioHook = require("iohook");
 
 console.log("packaged?:", app.isPackaged);
 
+app.disableHardwareAcceleration();
+
 let mainWindow = null;
+let devToolsOpen = false;
 
 ioHook.on("keydown", (key) => {
   console.log("down:", key.keycode);
@@ -35,6 +38,15 @@ ioHook.on("mouseup", (event) => {
   mainWindow.webContents.send("mouseup", event);
 });
 
+// lctrl + lshift + lalt + x => toggle dev tools
+ioHook.registerShortcut([29, 42, 56, 45], () => {
+  console.log("we pressed", devToolsOpen);
+  if (devToolsOpen)
+    BrowserWindow.getFocusedWindow().webContents.closeDevTools();
+  else BrowserWindow.getFocusedWindow().webContents.openDevTools();
+  devToolsOpen = !devToolsOpen;
+});
+
 ioHook.start();
 
 const createWindow = () => {
@@ -48,7 +60,9 @@ const createWindow = () => {
 
   // Create the browser window.
   mainWindow = new BrowserWindow({
-    // frame: false,
+    frame: false,
+    // resizable: false,
+    offscreen: true,
     width: 1000,
     height: 600,
     webPreferences: {
@@ -103,4 +117,31 @@ app.on("activate", () => {
   if (BrowserWindow.getAllWindows().length === 0) {
     createWindow();
   }
+});
+
+ipcMain.on("resize-main-window", (e, width, height) => {
+  console.log("RESIZE MAIN WINDOW", width, height);
+  mainWindow.setSize(width || 1000, height || 1000);
+});
+
+ipcMain.on("close-main-window", () => {
+  BrowserWindow.getFocusedWindow().close();
+});
+
+ipcMain.on("minimize-main-window", () => {
+  BrowserWindow.getFocusedWindow().minimize();
+});
+
+ipcMain.on("open-dev-tools", (e, open) => {
+  if (open) BrowserWindow.getFocusedWindow().webContents.openDevTools();
+  else BrowserWindow.getFocusedWindow().webContents.closeDevTools();
+});
+
+ipcMain.on("register-shortcut", (e, keycodes, fn) => {
+  console.log(keycodes, fn);
+  ioHook.registerShortcut(keycodes, fn);
+});
+
+ipcMain.on("unregister-shortcut", (e, keycodes) => {
+  ioHook.unregisterShortcutByKeys(keycodes);
 });
