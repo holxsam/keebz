@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import styled from "@emotion/styled";
 import KeyboardLayout from "./components/KeyboardLayout";
 
@@ -12,9 +12,13 @@ import {
   restrictToWindowEdges,
   restrictToParentElement,
 } from "@dnd-kit/modifiers";
+import MenuBar from "./components/MenuBar";
+import { useUIState } from "./contexts/UIContext";
+import useResizeObserver from "use-resize-observer";
 
 const AppContainer = styled.div`
   /* border: 2px dashed lightblue; */
+  overflow: hidden;
 
   position: relative;
   width: 100%;
@@ -28,28 +32,37 @@ const AppContainer = styled.div`
   }
 `;
 
-const LastInput = styled.p`
-  background-color: ${({ theme }) => theme.colors.primary.main};
-  padding: 0.25rem;
+const Main = styled.main`
+  -webkit-app-region: drag;
+  width: min-content;
+  height: min-content;
 `;
 
 const App = () => {
+  const { presentationMode, togglePresentationMode } = useUIState();
+  const mainRef = useRef(null);
+  const { width = 1000, height = 800 } = useResizeObserver({ ref: mainRef });
   // const { lastKeyPressed, kbInputs, isKeyPressed } =
   //   useGlobalKeyboardListener();
 
+  useEffect(() => {
+    const presentationModeWidth = presentationMode ? 0 : 0;
+    const presentationModeHeight = presentationMode ? 0 : 250 + 32;
+
+    const totalWidth = width + presentationModeWidth;
+    const totalHeight = height + presentationModeHeight;
+    console.log("hey resize the window", width, height);
+    window.ipcRenderer.send("resize-main-window", totalWidth, totalHeight);
+  }, [width, height, presentationMode]);
+
   return (
     <AppContainer id="app">
-      <Drawer />
-      {/* <KeyboardLayout layoutConfig={ORTHO_QWERTY} /> */}
-      {/* <LastInput>
-        last input: <pre>{JSON.stringify(lastKeyPressed, null, 2)}</pre>
-      </LastInput> */}
+      {!presentationMode && <MenuBar />}
+      {!presentationMode && <Drawer />}
 
-      {/* <KeyboardLayout layoutConfig={DEFAULT_QWERTY} /> */}
-      <KeyboardLayout layoutConfig={ORTHO_QWERTY} />
-      {/* <DndContext>
+      <Main ref={mainRef}>
         <KeyboardLayout layoutConfig={ORTHO_QWERTY} />
-      </DndContext> */}
+      </Main>
     </AppContainer>
   );
 };

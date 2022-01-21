@@ -167,7 +167,8 @@ export const GlobalReset = () => {
             this rule here.
           */
 
-          overflow: hidden scroll !important;
+          /* overflow: hidden scroll !important; */
+          overflow: hidden;
           scroll-behavior: smooth;
 
           background-color: ${theme.colors.background.main};
@@ -175,6 +176,8 @@ export const GlobalReset = () => {
           /* background: ${`linear-gradient(45deg, ${theme.colors.primary.main}, ${theme.colors.primary.light})`}; */
 
           body {
+            overflow: hidden;
+
             /* border: 2px dashed salmon; */
 
             /* overflow: auto; */
@@ -184,6 +187,8 @@ export const GlobalReset = () => {
             /* height: 100%; */
 
             #root {
+              overflow: hidden;
+
               /* border: 2px dashed orange; */
 
               /* overflow: hidden; */

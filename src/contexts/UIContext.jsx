@@ -44,9 +44,11 @@ const UIStateProvider = ({ children }) => {
   const isMobile = useMediaQuery({
     query: `(max-width: ${theme.breakpoints.s}px)`,
   });
-  const [drawerState, setDrawerState] = useState(false);
+  const [drawerState, setDrawerState] = useState(true);
+  const [presentationMode, setPresentationMode] = useState(false);
 
   const toggleDrawer = () => setDrawerState((v) => !v);
+  const togglePresentationMode = () => setPresentationMode((v) => !v);
 
   // const scrollRef = useRef<HTMLElement>();
 
@@ -57,6 +59,9 @@ const UIStateProvider = ({ children }) => {
         drawerState,
         setDrawerState,
         toggleDrawer,
+        presentationMode,
+        setPresentationMode,
+        togglePresentationMode,
       }}
     >
       {children}
