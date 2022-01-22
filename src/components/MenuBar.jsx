@@ -7,7 +7,6 @@ import { useEffect, useRef, useState } from "react";
 import useDraggableWindow from "../hooks/useDraggableWindow";
 
 const Container = styled.div`
-  /* -webkit-app-region: drag; */
   user-select: none;
 
   height: 32px;
@@ -21,7 +20,6 @@ const Container = styled.div`
 `;
 
 const buttonStyles = css`
-  -webkit-app-region: no-drag;
   width: 24px;
   height: 24px;
   border-radius: 5px;
@@ -43,23 +41,17 @@ const buttonStyles = css`
 
 const CloseButton = styled.button`
   background-color: #ef4958;
-  /* background-color: #f28fad; */
   ${buttonStyles}
 `;
 
 const MinimizeButton = styled.button`
-  background-color: #49d0b0;
-  background-color: #fae3b0;
   background-color: #ffe27c;
-
   ${buttonStyles}
 `;
 
 const PresentationButton = styled.button``;
 
 const MenuBar = () => {
-  const [rightClicks, setRightClicks] = useState(0);
-
   const { togglePresentationMode } = useUIState();
   const draggableBindings = useDraggableWindow();
 
@@ -71,14 +63,7 @@ const MenuBar = () => {
   };
 
   return (
-    <Container
-      onContextMenu={(e) => {
-        console.log("RIGHT CLICKED");
-        setRightClicks((v) => v + 1);
-      }}
-      {...draggableBindings}
-    >
-      {rightClicks}
+    <Container {...draggableBindings}>
       <PresentationButton type="button" onClick={togglePresentationMode}>
         Presentation Mode
       </PresentationButton>

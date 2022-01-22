@@ -8,15 +8,13 @@ const {
   protocol,
   Menu,
 } = require("electron");
-
 const ioHook = require("iohook");
 
 console.log("packaged?:", app.isPackaged);
 
 app.disableHardwareAcceleration();
-// Menu.setApplicationMenu(null);
+
 let mainWindow = null;
-let devToolsOpen = false;
 
 ioHook.on("keydown", (key) => {
   console.log("down:", key.keycode);
@@ -40,11 +38,13 @@ ioHook.on("mouseup", (event) => {
 
 // lctrl + lshift + lalt + x => toggle dev tools
 ioHook.registerShortcut([29, 42, 56, 45], () => {
-  console.log("we pressed", devToolsOpen);
-  if (devToolsOpen)
+  if (BrowserWindow.getFocusedWindow().webContents.isDevToolsOpened()) {
     BrowserWindow.getFocusedWindow().webContents.closeDevTools();
-  else BrowserWindow.getFocusedWindow().webContents.openDevTools();
-  devToolsOpen = !devToolsOpen;
+    BrowserWindow.getFocusedWindow().setResizable(false);
+  } else {
+    BrowserWindow.getFocusedWindow().webContents.openDevTools();
+    BrowserWindow.getFocusedWindow().setResizable(true);
+  }
 });
 
 ioHook.start();
@@ -136,6 +136,7 @@ ipcMain.on("close-main-window", () => {
 ipcMain.on("minimize-main-window", () => {
   BrowserWindow.getFocusedWindow().minimize();
 });
+
 ipcMain.on("get-cursor-position", () => {
   const mousePosition = screen.getCursorScreenPoint();
   console.log(mousePosition);
@@ -151,14 +152,6 @@ ipcMain.on(
     BrowserWindow.getFocusedWindow().setPosition(wxf, wyf);
   }
 );
-// ipcMain.on("move-window", (e, delta) => {
-//   const [x, y] = BrowserWindow.getFocusedWindow().getPosition();
-//   console.log("current pos", x, y);
-//   const xf = x + delta.x;
-//   const yf = y + delta.y;
-//   console.log(xf, yf);
-//   BrowserWindow.getFocusedWindow().setPosition(xf, yf);
-// });
 
 ipcMain.on("open-dev-tools", (e, open) => {
   if (open) BrowserWindow.getFocusedWindow().webContents.openDevTools();
