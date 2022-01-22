@@ -14,7 +14,7 @@ const ioHook = require("iohook");
 console.log("packaged?:", app.isPackaged);
 
 app.disableHardwareAcceleration();
-
+// Menu.setApplicationMenu(null);
 let mainWindow = null;
 let devToolsOpen = false;
 
@@ -29,12 +29,12 @@ ioHook.on("keyup", (key) => {
 });
 
 ioHook.on("mousedown", (event) => {
-  console.log("mdown:", event);
+  // console.log("mdown:", event);
   mainWindow.webContents.send("mousedown", event);
 });
 
 ioHook.on("mouseup", (event) => {
-  console.log("mup  :", event);
+  // console.log("mup  :", event);
   mainWindow.webContents.send("mouseup", event);
 });
 
@@ -61,31 +61,34 @@ const createWindow = () => {
   // Create the browser window.
   mainWindow = new BrowserWindow({
     frame: false,
-    // resizable: false,
+    resizable: false,
     offscreen: true,
     width: 1000,
     height: 600,
+    titleBarStyle: "hidden",
+    titleBarOverlay: true,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       nodeIntegration: true,
       // allowRunningInsecureContent: serve,
       contextIsolation: false,
-      enableRemoteModule: true,
+      enableRemoteModule: false,
       devTools: true,
       nativeWindowOpen: true,
     },
   });
+  // mainWindow.setMenu(null);
 
   // app.dock.hide();
   // mainWindow.setAlwaysOnTop(true, "normal");
+  // mainWindow.setMenuBarVisibility(false);
+
   mainWindow.setVisibleOnAllWorkspaces(true);
   mainWindow.setFullScreenable(false);
 
   //load the index.html from a url
   mainWindow.loadURL(startUrl);
-
-  // Open the DevTools.
-  // mainWindow.webContents.openDevTools();
+  // mainWindow.removeMenu();
 };
 
 // IMPORTANT: option should be set to false to make it possible for ioHook global event
@@ -121,7 +124,9 @@ app.on("activate", () => {
 
 ipcMain.on("resize-main-window", (e, width, height) => {
   console.log("RESIZE MAIN WINDOW", width, height);
+  mainWindow.setResizable(true);
   mainWindow.setSize(width || 1000, height || 1000);
+  mainWindow.setResizable(false);
 });
 
 ipcMain.on("close-main-window", () => {
@@ -131,6 +136,29 @@ ipcMain.on("close-main-window", () => {
 ipcMain.on("minimize-main-window", () => {
   BrowserWindow.getFocusedWindow().minimize();
 });
+ipcMain.on("get-cursor-position", () => {
+  const mousePosition = screen.getCursorScreenPoint();
+  console.log(mousePosition);
+});
+
+ipcMain.on("get-window-position", () => {});
+
+ipcMain.on(
+  "manual-move-window",
+  (e, windowToCursorDelta, currentCursorPosition) => {
+    const wxf = currentCursorPosition.x - windowToCursorDelta.x;
+    const wyf = currentCursorPosition.y - windowToCursorDelta.y;
+    BrowserWindow.getFocusedWindow().setPosition(wxf, wyf);
+  }
+);
+// ipcMain.on("move-window", (e, delta) => {
+//   const [x, y] = BrowserWindow.getFocusedWindow().getPosition();
+//   console.log("current pos", x, y);
+//   const xf = x + delta.x;
+//   const yf = y + delta.y;
+//   console.log(xf, yf);
+//   BrowserWindow.getFocusedWindow().setPosition(xf, yf);
+// });
 
 ipcMain.on("open-dev-tools", (e, open) => {
   if (open) BrowserWindow.getFocusedWindow().webContents.openDevTools();

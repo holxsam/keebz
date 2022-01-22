@@ -3,8 +3,12 @@ import { css } from "@emotion/react";
 import { MdClose, MdMinimize } from "react-icons/md";
 import { useUIState } from "../contexts/UIContext";
 
+import { useEffect, useRef, useState } from "react";
+import useDraggableWindow from "../hooks/useDraggableWindow";
+
 const Container = styled.div`
-  -webkit-app-region: drag;
+  /* -webkit-app-region: drag; */
+  user-select: none;
 
   height: 32px;
   padding: 0.5rem;
@@ -51,12 +55,13 @@ const MinimizeButton = styled.button`
   ${buttonStyles}
 `;
 
-const PresentationButton = styled.button`
-  -webkit-app-region: no-drag;
-`;
+const PresentationButton = styled.button``;
 
 const MenuBar = () => {
+  const [rightClicks, setRightClicks] = useState(0);
+
   const { togglePresentationMode } = useUIState();
+  const draggableBindings = useDraggableWindow();
 
   const minimizeWindow = () => {
     window.ipcRenderer.send("minimize-main-window");
@@ -64,8 +69,16 @@ const MenuBar = () => {
   const closeWindow = () => {
     window.ipcRenderer.send("close-main-window");
   };
+
   return (
-    <Container>
+    <Container
+      onContextMenu={(e) => {
+        console.log("RIGHT CLICKED");
+        setRightClicks((v) => v + 1);
+      }}
+      {...draggableBindings}
+    >
+      {rightClicks}
       <PresentationButton type="button" onClick={togglePresentationMode}>
         Presentation Mode
       </PresentationButton>

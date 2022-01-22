@@ -15,6 +15,7 @@ import {
 import MenuBar from "./components/MenuBar";
 import { useUIState } from "./contexts/UIContext";
 import useResizeObserver from "use-resize-observer";
+import useDraggableWindow from "./hooks/useDraggableWindow";
 
 const AppContainer = styled.div`
   /* border: 2px dashed lightblue; */
@@ -33,7 +34,6 @@ const AppContainer = styled.div`
 `;
 
 const Main = styled.main`
-  -webkit-app-region: drag;
   width: min-content;
   height: min-content;
 `;
@@ -42,6 +42,7 @@ const App = () => {
   const { presentationMode, togglePresentationMode } = useUIState();
   const mainRef = useRef(null);
   const { width = 1000, height = 800 } = useResizeObserver({ ref: mainRef });
+  const draggableWindowBindings = useDraggableWindow();
   // const { lastKeyPressed, kbInputs, isKeyPressed } =
   //   useGlobalKeyboardListener();
 
@@ -60,7 +61,7 @@ const App = () => {
       {!presentationMode && <MenuBar />}
       {!presentationMode && <Drawer />}
 
-      <Main ref={mainRef}>
+      <Main ref={mainRef} {...draggableWindowBindings}>
         <KeyboardLayout layoutConfig={ORTHO_QWERTY} />
       </Main>
     </AppContainer>

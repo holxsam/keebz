@@ -28,7 +28,6 @@ const BlankKey = styled.button`
 `;
 
 const Key = styled(motion.button)`
-  -webkit-app-region: no-drag;
   width: 100%;
   height: 100%;
   overflow: hidden;
