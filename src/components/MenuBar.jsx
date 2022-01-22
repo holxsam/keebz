@@ -9,6 +9,7 @@ import useDraggableWindow from "../hooks/useDraggableWindow";
 const Container = styled.div`
   user-select: none;
 
+  width: 100vw;
   height: 32px;
   padding: 0.5rem;
 
@@ -20,10 +21,10 @@ const Container = styled.div`
 `;
 
 const buttonStyles = css`
-  width: 24px;
-  height: 24px;
-  border-radius: 5px;
-  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  /* border-radius: 50%; */
 
   display: flex;
   justify-content: center;

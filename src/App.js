@@ -18,10 +18,15 @@ import useResizeObserver from "use-resize-observer";
 import useDraggableWindow from "./hooks/useDraggableWindow";
 
 const AppContainer = styled.div`
-  /* border: 2px dashed lightblue; */
+  /* border: 1px dashed lightblue; */
+  background-color: ${({ theme }) => theme.colors.background.main};
+
+  border-radius: 10px;
+
   overflow: hidden;
 
   position: relative;
+
   width: 100%;
   min-height: 100vh;
 
@@ -33,36 +38,63 @@ const AppContainer = styled.div`
   }
 `;
 
-const Main = styled.main`
+const Header = styled.header`
+  /* border: 1px solid green; */
+
   width: min-content;
   height: min-content;
+`;
+
+const Main = styled.main`
+  /* border: 1px dashed red; */
+
+  width: min-content;
+  height: min-content;
+
+  display: flex;
+  justify-content: center;
+`;
+
+const Content = styled.div`
+  /* border: 1px dashed green; */
+
+  display: flex;
+  flex-direction: column;
+`;
+
+const MockComp = styled.div`
+  width: 100%;
+  height: 2rem;
+  background-color: salmon;
 `;
 
 const App = () => {
   const { presentationMode, togglePresentationMode } = useUIState();
   const mainRef = useRef(null);
-  const { width = 1000, height = 800 } = useResizeObserver({ ref: mainRef });
+  const headerRef = useRef(null);
+  const { width: mainWidth = 0, height: mainHeight = 0 } = useResizeObserver({
+    ref: mainRef,
+  });
+  const { width: headerWidth = 0, height: headerHeight = 0 } =
+    useResizeObserver({ ref: headerRef });
   const draggableWindowBindings = useDraggableWindow();
-  // const { lastKeyPressed, kbInputs, isKeyPressed } =
-  //   useGlobalKeyboardListener();
 
   useEffect(() => {
-    const presentationModeWidth = presentationMode ? 0 : 0;
-    const presentationModeHeight = presentationMode ? 0 : 250 + 32;
-
-    const totalWidth = width + presentationModeWidth;
-    const totalHeight = height + presentationModeHeight;
-    console.log("hey resize the window", width, height);
+    const totalWidth = mainWidth;
+    const totalHeight = headerHeight + mainHeight;
     window.ipcRenderer.send("resize-main-window", totalWidth, totalHeight);
-  }, [width, height, presentationMode]);
+  }, [mainWidth, mainHeight, headerWidth, headerHeight, presentationMode]);
 
   return (
     <AppContainer id="app">
-      {!presentationMode && <MenuBar />}
-      {!presentationMode && <Drawer />}
+      <Header ref={headerRef}>{!presentationMode && <MenuBar />}</Header>
 
       <Main ref={mainRef} {...draggableWindowBindings}>
-        <KeyboardLayout layoutConfig={ORTHO_QWERTY} />
+        {!presentationMode && <Drawer />}
+        <Content>
+          {!presentationMode && <MockComp />}
+          <KeyboardLayout layoutConfig={ORTHO_QWERTY} />
+        </Content>
       </Main>
     </AppContainer>
   );

@@ -171,7 +171,7 @@ export const GlobalReset = () => {
           overflow: hidden;
           scroll-behavior: smooth;
 
-          background-color: ${theme.colors.background.main};
+          background-color: transparent;
 
           /* background: ${`linear-gradient(45deg, ${theme.colors.primary.main}, ${theme.colors.primary.light})`}; */
 

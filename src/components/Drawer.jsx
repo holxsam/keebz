@@ -3,10 +3,15 @@ import { motion } from "framer-motion";
 import { useUIState } from "../contexts/UIContext";
 
 const Container = styled(motion.div)`
-  /* border: 1px solid white; */
+  /* border: 1px dashed white; */
 
   overflow: hidden;
-  width: 100%;
+
+  /* height: 100%; */
+  /* min-height: 100%; */
+
+  width: 250px;
+  /* width: 100%; */
   /* position: absolute; */
 
   background-color: rgba(0, 0, 0, 1);
@@ -19,9 +24,13 @@ const Drawer = () => {
 
   const animProps = {
     variants: {
-      open: { height: 250 },
+      open: {
+        // height: 250
+        width: 250,
+      },
       closed: {
-        height: 14,
+        // height: 14,
+        width: 2,
       },
     },
     initial: "closed",
