@@ -16,12 +16,16 @@ import MenuBar from "./components/MenuBar";
 import { useUIState } from "./contexts/UIContext";
 import useResizeObserver from "use-resize-observer";
 import useDraggableWindow from "./hooks/useDraggableWindow";
+import { AnimatePresence } from "framer-motion";
+import Keyboard from "./components/Keyboard";
 
 const AppContainer = styled.div`
   /* border: 1px dashed lightblue; */
+  border: 1px solid ${({ theme }) => theme.colors.surface.main};
   background-color: ${({ theme }) => theme.colors.background.main};
+  /* background-color: transparent; */
 
-  border-radius: 10px;
+  /* border-radius: 10px; */
 
   overflow: hidden;
 
@@ -42,6 +46,7 @@ const Header = styled.header`
   /* border: 1px solid green; */
 
   width: min-content;
+  width: 100%;
   height: min-content;
 `;
 
@@ -77,24 +82,32 @@ const App = () => {
   });
   const { width: headerWidth = 0, height: headerHeight = 0 } =
     useResizeObserver({ ref: headerRef });
-  const draggableWindowBindings = useDraggableWindow();
+  const { eventBindings, setDisableDrag } = useDraggableWindow();
 
   useEffect(() => {
-    const totalWidth = mainWidth;
-    const totalHeight = headerHeight + mainHeight;
+    const totalWidth = mainWidth + 2;
+    const totalHeight = headerHeight + mainHeight + 2;
     window.ipcRenderer.send("resize-main-window", totalWidth, totalHeight);
   }, [mainWidth, mainHeight, headerWidth, headerHeight, presentationMode]);
 
+  useEffect(() => {
+    if (presentationMode) setDisableDrag(false);
+    else setDisableDrag(true);
+  }, [presentationMode]);
+
   return (
     <AppContainer id="app">
-      <Header ref={headerRef}>{!presentationMode && <MenuBar />}</Header>
+      <Header ref={headerRef}>
+        <AnimatePresence>{!presentationMode && <MenuBar />} </AnimatePresence>
+      </Header>
 
-      <Main ref={mainRef} {...draggableWindowBindings}>
-        {!presentationMode && <Drawer />}
-        <Content>
+      <Main id="main" ref={mainRef} {...eventBindings}>
+        <AnimatePresence>{!presentationMode && <Drawer />}</AnimatePresence>
+        {/* <Content>
           {!presentationMode && <MockComp />}
           <KeyboardLayout layoutConfig={ORTHO_QWERTY} />
-        </Content>
+        </Content> */}
+        <Keyboard />
       </Main>
     </AppContainer>
   );

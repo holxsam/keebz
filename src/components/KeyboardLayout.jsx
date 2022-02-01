@@ -35,6 +35,7 @@ const Container = styled.div`
   padding: 1rem;
   border: 2px solid ${({ theme }) => theme.colors.onPrimary.main};
   border-radius: 10px;
+  background-color: ${({ theme }) => theme.colors.background.main};
 
   margin: 1rem;
   width: min-content;
@@ -72,23 +73,21 @@ const rowify = (arr) => {
 
   const rowNumbers = new Set();
   arr.forEach((item) => {
-    rowNumbers.add(item.position.row);
+    rowNumbers.add(item.y);
   });
 
   const rows = [...rowNumbers].sort();
 
   rows.forEach((row) => {
     finalArray.push(
-      arr
-        .filter((item) => item.position.row === row)
-        .sort((a, b) => a.position.col - b.position.col)
+      arr.filter((item) => item.y === row).sort((a, b) => a.x - b.x)
     );
   });
 
   return finalArray;
 };
 
-const KeyboardLayout = ({ layoutConfig = DEFAULT_LAYOUT }) => {
+const KeyboardLayout = ({ layoutConfig = DEFAULT_LAYOUT, editLayout }) => {
   const {
     drawerState,
     setDrawerState,
@@ -101,7 +100,7 @@ const KeyboardLayout = ({ layoutConfig = DEFAULT_LAYOUT }) => {
 
   const { mouseInputs, isMouseClickHeld } = useGlobalMouseListener();
 
-  const [layout, setLayout] = useState(layoutConfig.layout);
+  const { layout } = layoutConfig;
   const layout2d = rowify(layout);
   const [keySelectedId, setKeySelectedId] = useState(null);
   const keySelected = layout.find((key) => key.id === keySelectedId) ?? null;
@@ -124,22 +123,15 @@ const KeyboardLayout = ({ layoutConfig = DEFAULT_LAYOUT }) => {
     isKeyPressed(keycode) || isMouseClickHeld(keycode);
   const deselectKeys = () => setKeySelectedId(null);
 
-  const changeKeyConfig = (id, values) => {
-    setLayout((layout) => {
-      const index = layout.findIndex((item) => item.id === id);
-      if (index !== -1)
-        return [
-          ...layout.slice(0, index),
-          ...layout.slice(index + 1, layout.length),
-          { ...layout[index], ...values },
-        ];
-      else return layout;
-    });
-  };
-
   useEffect(() => {
     if (presentationMode) setKeySelectedId(null);
   }, [presentationMode]);
+
+  useEffect(() => {
+    // when the layout id changes, it means that a new layout was switched to
+    // therefore we should close the key editor
+    setKeySelectedId(null);
+  }, [layoutConfig.id]);
 
   return (
     <DndContext
@@ -189,7 +181,7 @@ const KeyboardLayout = ({ layoutConfig = DEFAULT_LAYOUT }) => {
                   step={0.05}
                   value={keySelected.w}
                   onChange={(val) => {
-                    changeKeyConfig(keySelected.id, {
+                    editLayout(keySelected.id, {
                       w: val,
                     });
                   }}
@@ -201,7 +193,7 @@ const KeyboardLayout = ({ layoutConfig = DEFAULT_LAYOUT }) => {
                   step={0.05}
                   value={keySelected.h}
                   onChange={(val) => {
-                    changeKeyConfig(keySelected.id, {
+                    editLayout(keySelected.id, {
                       h: val,
                     });
                   }}

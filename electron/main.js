@@ -10,7 +10,8 @@ const {
 } = require("electron");
 const ioHook = require("iohook");
 
-console.log("packaged?:", app.isPackaged);
+console.log({ __dirname });
+console.log("hey:", app.getAppPath("userData"));
 
 app.disableHardwareAcceleration();
 
@@ -61,11 +62,13 @@ const createWindow = () => {
   // Create the browser window.
   mainWindow = new BrowserWindow({
     frame: false,
-    resizable: false,
+    // resizable: false,
+    resizable: true,
     offscreen: true,
     width: 1000,
     height: 600,
-    transparent: true,
+    backgroundColor: "#2e3035",
+    // transparent: true,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       nodeIntegration: true,
@@ -163,5 +166,9 @@ ipcMain.on("register-shortcut", (e, keycodes, fn) => {
 });
 
 ipcMain.on("unregister-shortcut", (e, keycodes) => {
+  ioHook.unregisterShortcutByKeys(keycodes);
+});
+
+ipcMain.on("", (e, keycodes) => {
   ioHook.unregisterShortcutByKeys(keycodes);
 });
